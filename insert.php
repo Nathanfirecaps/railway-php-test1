@@ -9,6 +9,20 @@ $conn = new mysqli(
     getenv("MYSQLPORT")
 );
 
+$conn->query("
+CREATE TABLE IF NOT EXISTS bme_readings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    temperature_C FLOAT,
+    humidity_rh FLOAT,
+    pressure_hPa FLOAT,
+    gas_resistance_ohm FLOAT,
+    heat_index_C FLOAT,
+    water_level_m FLOAT,
+    installation_height_m FLOAT
+)
+");
+
 if ($conn->connect_error) {
     http_response_code(500);
     echo json_encode(["error" => "DB connection failed"]);
