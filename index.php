@@ -35,6 +35,7 @@
     <p>🌬 Pressure: <b><span id="pres">--</span> hPa</b></p>
     <p>🌊 Water Level: <b><span id="water">--</span> m</b></p>
     <p>📏 Installation Height: <b><span id="height">--</span> m</b></p>
+    <p>🌧 Rainfall: <b><span id="rain">--</span> mm</b></p>
     <small>Last update: <span id="time">--</span></small>
 </div>
 
@@ -51,6 +52,7 @@ function updateData() {
             document.getElementById("pres").textContent = data.pressure_hPa;
             document.getElementById("water").textContent = data.water_level_m;
             document.getElementById("height").textContent = data.installation_height_m;
+            document.getElementById("rain").textContent = data.rainfall_mm;
             document.getElementById("time").textContent = data.ts;
         });
 }
