@@ -25,14 +25,32 @@ if ($conn->connect_error) {
     exit();
 }
 
-// ---- AUTO-CREATE TABLE ----
-$conn->query("\nCREATE TABLE IF NOT EXISTS bme_readings (\n    id INT AUTO_INCREMENT PRIMARY KEY,\n    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    temperature_C FLOAT,\n    humidity_rh FLOAT,\n    pressure_hPa FLOAT,\n    gas_resistance_ohm FLOAT,\n    heat_index_C FLOAT,\n    water_level_m FLOAT,\n    installation_height_m FLOAT,\n    rainfall_mm FLOAT\n)\n");
+// ---- AUTO-CREATE TABLE (UPDATED WITH PM COLUMNS) ----
+$conn->query("
+CREATE TABLE IF NOT EXISTS bme_readings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    temperature_C FLOAT,
+    humidity_rh FLOAT,
+    pressure_hPa FLOAT,
+    gas_resistance_ohm FLOAT,
+    heat_index_C FLOAT,
+
+    pm1_0 FLOAT,
+    pm2_5 FLOAT,
+    pm10  FLOAT,
+
+    water_level_m FLOAT,
+    installation_height_m FLOAT,
+    rainfall_mm FLOAT
+)
+");
 
 // ---- READ INPUT ----
 $data = json_decode(file_get_contents("php://input"), true);
 
-// ---- INSERT ----
-
+// ---- INSERT (UPDATED) ----
 $stmt = $conn->prepare("
     INSERT INTO bme_readings
     (
@@ -41,20 +59,30 @@ $stmt = $conn->prepare("
         pressure_hPa,
         gas_resistance_ohm,
         heat_index_C,
+
+        pm1_0,
+        pm2_5,
+        pm10,
+
         water_level_m,
         installation_height_m,
         rainfall_mm
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
 $stmt->bind_param(
-    "dddddddd",
+    "ddddddddddd",
     $data["temperature"],
     $data["humidity"],
     $data["pressure"],
     $data["gas"],
     $data["heat_index"],
+
+    $data["pm1_0"],
+    $data["pm2_5"],
+    $data["pm10"],
+
     $data["water_level"],
     $data["installation_height"],
     $data["rain_mm"]
@@ -63,4 +91,3 @@ $stmt->bind_param(
 $stmt->execute();
 
 echo json_encode(["status" => "ok"]);
-

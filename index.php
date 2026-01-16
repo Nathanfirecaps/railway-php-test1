@@ -16,11 +16,16 @@
             border:1px solid #38bdf8;
             border-radius:12px;
             padding:20px;
-            width:340px;
+            width:360px;
             margin:auto;
         }
         h1 { color:#38bdf8; }
-        p { font-size:16px; }
+        p { font-size:16px; margin:6px 0; }
+        hr {
+            border:0;
+            border-top:1px solid #1e293b;
+            margin:10px 0;
+        }
         small { color:#94a3b8; }
     </style>
 </head>
@@ -33,9 +38,19 @@
     <p>💧 Humidity: <b><span id="hum">--</span> %</b></p>
     <p>🔥 Heat Index: <b><span id="hi">--</span> °C</b></p>
     <p>🌬 Pressure: <b><span id="pres">--</span> hPa</b></p>
+
+    <hr>
+
+    <p>🫁 PM1.0: <b><span id="pm1">--</span> µg/m³</b></p>
+    <p>🫁 PM2.5: <b><span id="pm25">--</span> µg/m³</b></p>
+    <p>🫁 PM10: <b><span id="pm10">--</span> µg/m³</b></p>
+
+    <hr>
+
     <p>🌊 Water Level: <b><span id="water">--</span> m</b></p>
     <p>📏 Installation Height: <b><span id="height">--</span> m</b></p>
     <p>🌧 Rainfall: <b><span id="rain">--</span> mm</b></p>
+
     <small>Last update: <span id="time">--</span></small>
 </div>
 
@@ -46,15 +61,22 @@ function updateData() {
         .then(data => {
             if (!data) return;
 
-            document.getElementById("temp").textContent = data.temperature_C;
-            document.getElementById("hum").textContent = data.humidity_rh;
-            document.getElementById("hi").textContent = data.heat_index_C;
-            document.getElementById("pres").textContent = data.pressure_hPa;
-            document.getElementById("water").textContent = data.water_level_m;
+            document.getElementById("temp").textContent   = data.temperature_C;
+            document.getElementById("hum").textContent    = data.humidity_rh;
+            document.getElementById("hi").textContent     = data.heat_index_C;
+            document.getElementById("pres").textContent   = data.pressure_hPa;
+
+            // PM readings (NEW)
+            document.getElementById("pm1").textContent    = data.pm1_0;
+            document.getElementById("pm25").textContent   = data.pm2_5;
+            document.getElementById("pm10").textContent   = data.pm10;
+
+            document.getElementById("water").textContent  = data.water_level_m;
             document.getElementById("height").textContent = data.installation_height_m;
-            document.getElementById("rain").textContent = data.rainfall_mm;
-            document.getElementById("time").textContent = data.ts;
-        });
+            document.getElementById("rain").textContent   = data.rainfall_mm;
+            document.getElementById("time").textContent   = data.ts;
+        })
+        .catch(err => console.error(err));
 }
 
 updateData();
@@ -63,4 +85,3 @@ setInterval(updateData, 2000);
 
 </body>
 </html>
-
