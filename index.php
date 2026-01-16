@@ -47,8 +47,8 @@
 
     <hr>
 
-    <p>🌊 Water Level: <b><span id="water">--</span> m</b></p>
-    <p>📏 Installation Height: <b><span id="height">--</span> m</b></p>
+    <p>🌊 Installation Height: <b><span id="water">--</span> m</b></p>
+    <p>📏 Water Level: <b><span id="height">--</span> m</b></p>
     <p>🌧 Rainfall: <b><span id="rain">--</span> mm</b></p>
 
     <small>Last update: <span id="time">--</span></small>
