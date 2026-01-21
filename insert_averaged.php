@@ -1,16 +1,14 @@
 <?php
-// ---- CORS HEADERS (REQUIRED FOR VERCEL + PI) ----
+// ---- CORS HEADERS ----
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Handle preflight request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// ---- DATABASE CONNECTION ----
 $conn = new mysqli(
     getenv("MYSQLHOST"),
     getenv("MYSQLUSER"),
@@ -25,9 +23,9 @@ if ($conn->connect_error) {
     exit();
 }
 
-// ---- AUTO-CREATE TABLE (UPDATED WITH PM COLUMNS) ----
+// Create averaged table (safe if it already exists)
 $conn->query("
-CREATE TABLE IF NOT EXISTS bme_readings (
+CREATE TABLE IF NOT EXISTS averaged_readings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
@@ -46,12 +44,15 @@ CREATE TABLE IF NOT EXISTS bme_readings (
 )
 ");
 
-// ---- READ INPUT ----
 $data = json_decode(file_get_contents("php://input"), true);
+if (!$data) {
+    http_response_code(400);
+    echo json_encode(["error" => "Invalid JSON"]);
+    exit();
+}
 
-// ---- INSERT (UPDATED) ----
 $stmt = $conn->prepare("
-    INSERT INTO bme_readings
+    INSERT INTO averaged_readings
     (
         temperature_C,
         humidity_rh,
