@@ -40,9 +40,29 @@ CREATE TABLE IF NOT EXISTS averaged_readings (
 
     water_level_m FLOAT,
     installation_height_m FLOAT,
-    rainfall_mm FLOAT
+    rainfall_mm FLOAT,
+    vibration_detected TINYINT,
+    vibration_intensity FLOAT DEFAULT 0
 )
 ");
+
+// Ensure columns exist for older deployments (without failing if they already exist)
+$res = $conn->query("SELECT COUNT(*) AS c FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'averaged_readings' AND COLUMN_NAME = 'vibration_detected'");
+if ($res) {
+    $row = $res->fetch_assoc();
+    $exists = intval($row['c'] ?? 0);
+    if ($exists === 0) {
+        $conn->query("ALTER TABLE averaged_readings ADD COLUMN vibration_detected TINYINT DEFAULT 0");
+    }
+}
+$res2 = $conn->query("SELECT COUNT(*) AS c FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'averaged_readings' AND COLUMN_NAME = 'vibration_intensity'");
+if ($res2) {
+    $row2 = $res2->fetch_assoc();
+    $exists2 = intval($row2['c'] ?? 0);
+    if ($exists2 === 0) {
+        $conn->query("ALTER TABLE averaged_readings ADD COLUMN vibration_intensity FLOAT DEFAULT 0");
+    }
+}
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!$data) {
@@ -65,13 +85,18 @@ $stmt = $conn->prepare("
 
         water_level_m,
         installation_height_m,
-        rainfall_mm
+        rainfall_mm,
+        vibration_detected,
+        vibration_intensity
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 
+$vib_detected = intval($data["vibration_detected"] ?? 0);
+$vib_intensity = floatval($data["vibration_intensity"] ?? 0);
+
 $stmt->bind_param(
-    "dddddddddd",
+    "ddddddddddid",
     $data["temperature"],
     $data["humidity"],
     $data["pressure"],
@@ -83,7 +108,9 @@ $stmt->bind_param(
 
     $data["water_level"],
     $data["installation_height"],
-    $data["rain_mm"]
+    $data["rain_mm"],
+    $vib_detected,
+    $vib_intensity
 );
 
 $stmt->execute();
