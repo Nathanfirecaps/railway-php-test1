@@ -25,6 +25,9 @@ if ($conn->connect_error) {
     exit();
 }
 
+// ---- SET TIMEZONE TO ASIA/MANILA (UTC+8) ----
+$conn->query("SET time_zone = '+08:00'");
+
 // ---- AUTO-CREATE TABLE (UPDATED WITH PM COLUMNS) ----
 $conn->query("
 CREATE TABLE IF NOT EXISTS bme_readings (

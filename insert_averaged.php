@@ -23,6 +23,9 @@ if ($conn->connect_error) {
     exit();
 }
 
+// ---- SET TIMEZONE TO ASIA/MANILA (UTC+8) ----
+$conn->query("SET time_zone = '+08:00'");
+
 // Create averaged table (safe if it already exists)
 $conn->query("
 CREATE TABLE IF NOT EXISTS averaged_readings (

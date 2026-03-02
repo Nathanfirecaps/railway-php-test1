@@ -23,6 +23,9 @@ if ($conn->connect_error) {
     exit();
 }
 
+// ---- SET TIMEZONE TO ASIA/MANILA (UTC+8) ----
+$conn->query("SET time_zone = '+08:00'");
+
 $res = $conn->query("
     SELECT *
     FROM averaged_readings

@@ -23,6 +23,9 @@ if ($conn->connect_error) {
     exit();
 }
 
+// ---- SET TIMEZONE TO ASIA/MANILA (UTC+8) ----
+$conn->query("SET time_zone = '+08:00'");
+
 // Get the latest forecast batch (all 12 horizons from the most recent ts)
 $res = $conn->query("
     SELECT horizon, heat_index, danger_raw, danger_calibrated, ts
